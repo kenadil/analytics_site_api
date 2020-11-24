@@ -49,26 +49,44 @@ app.get('/teachers', (req, res) => {
 
 app.delete(`/users/:id`, (req, res) => {
 	var objs = req.url.split("/")[2].replace(/_/g, ',');
+	console.log(objs);
 	dbconfig(`DELETE FROM students
 		WHERE student_id in (${objs})`, [], (err, results) => {
 			if (!err) {
+				console.log("Deleted a lot");
 				res.send(results);
+			}
+			else {
+				console.log(err.error);
 			}
 	});
 });
 
 app.patch(`/users/:id`, (req, res) => {
-	console.log(req.body);
-	dbconfig(`UPDATE students
-		SET	name='${req.body.name}',
-			gpa=${req.body.gpa},
-			enrollments=${req.body.enrollments},
-			category_id=${req.body.category}
-		WHERE student_id = ${req.body.id}`, [], (err, results) => {
+	if (req.url.split("/")[2].split("_").length > 1){
+		var objs = req.url.split("/")[2].replace(/_/g, ',');
+		dbconfig(`UPDATE students
+			SET category_id=${req.body.category}
+			WHERE student_id in (${objs})`, [], (err, results) => {
 			if (!err) {
+				console.log("Changed a lot");
 				res.send(results);
 			}
-	});
+		});
+	}
+	else {
+		console.log(req.body);
+		dbconfig(`UPDATE students
+			SET	name='${req.body.name}',
+				gpa=${req.body.gpa},
+				enrollments=${req.body.enrollments},
+				category_id=${req.body.category}
+			WHERE student_id = ${req.body.id}`, [], (err, results) => {
+				if (!err) {
+					res.send(results);
+				}
+		});
+	}
 });
 
 app.post(`/users`, (req, res) => {
