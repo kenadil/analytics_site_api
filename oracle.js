@@ -63,7 +63,7 @@ app.delete(`/users/:id`, (req, res) => {
 });
 
 app.patch(`/users/:id`, (req, res) => {
-	if (req.url.split("/")[2].split("_").length > 1){
+	if (req.body.id === undefined){
 		var objs = req.url.split("/")[2].replace(/_/g, ',');
 		dbconfig(`UPDATE students
 			SET category_id=${req.body.category}
@@ -75,7 +75,6 @@ app.patch(`/users/:id`, (req, res) => {
 		});
 	}
 	else {
-		console.log(req.body);
 		dbconfig(`UPDATE students
 			SET	name='${req.body.name}',
 				gpa=${req.body.gpa},
