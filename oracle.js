@@ -3,6 +3,7 @@ var app = express();
 var oracledb = require('oracledb');
 var dbconfig = require('./dbconfig.js');
 const cors = require('cors');
+var bodyParser = require('body-parser');
 
 oracledb.outFormat = oracledb.OUT_FORMAT_ARRAY;
 
@@ -12,6 +13,8 @@ app.use(
 	    credentials: true,
 	  })
 );
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -49,6 +52,35 @@ app.delete(`/users/:id`, (req, res) => {
 				res.send(results);
 			}
 	});
+});
+
+app.patch(`/users/:id`, (req, res) => {
+	console.log(req.body);
+	dbconfig(`UPDATE students
+		SET	name='${req.body.name}',
+			gpa=${req.body.gpa},
+			enrollments=${req.body.enrollments},
+			category_id=${req.body.category}
+		WHERE student_id = ${req.body.id}`, [], (err, results) => {
+			if (!err) {
+				res.send(results);
+			}
+	});
+});
+
+app.post(`/users`, (req, res) => {
+	dbconfig(`
+	INSERT INTO students
+	(student_id, student_key, name, date_added, gpa, enrollments, category_id)
+	VALUES 
+	(${req.body.id}, ${req.body.key}, 
+	'${req.body.name}', '${req.body.date}', ${req.body.gpa}, ${req.body.enrollments},
+	${req.body.category})`, [], (err, results) => {
+		if (!err) 
+			res.send(results);
+	});
+	/*console.log(JSON.stringify(req.body.name));
+	res.end(req.body);*/
 });
 
 app.listen(5000, function () {
