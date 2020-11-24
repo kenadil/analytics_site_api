@@ -26,7 +26,9 @@ app.get('/users', (req, res) => {
 		name as "name", date_added as "date",
 		gpa as "gpa", category_id as "category",
 		enrollments as "enrollments"
-		 FROM students`, [], function (err, results) {
+		 FROM students
+		 ORDER BY 
+		 student_id ASC`, [], function (err, results) {
 		if (!err) {
 			console.log('fecthed');
 			res.send(results.rows);
@@ -38,7 +40,7 @@ app.get('/users', (req, res) => {
 });
 
 app.get('/teachers', (req, res) => {
-	dbconfig(`SELECT teacher_id as "id", name as "name" FROM teachers`, [], function (err, results) {
+	dbconfig(`SELECT teacher_id as "id", name as "name" FROM teachers ORDER BY teacher_id ASC`, [], function (err, results) {
 		if (!err) {
 			res.send(results.rows);
 		}
@@ -46,8 +48,9 @@ app.get('/teachers', (req, res) => {
 });
 
 app.delete(`/users/:id`, (req, res) => {
+	var objs = req.url.split("/")[2].replace(/_/g, ',');
 	dbconfig(`DELETE FROM students
-		WHERE student_id = ${req.url.split("/")[2]}`, [], (err, results) => {
+		WHERE student_id in (${objs})`, [], (err, results) => {
 			if (!err) {
 				res.send(results);
 			}
